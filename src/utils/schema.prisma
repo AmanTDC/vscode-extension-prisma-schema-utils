@@ -1,39 +1,46 @@
-
-generator client { 
-	provider        = "prisma-client-js"
-	previewFeatures = ["multiSchema"]
-
-	
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
 }
 
-
-datasource db { 
-	provider = "mysql"
-	url      = "mysql://root:root1234@localhost:3306/compass"
-
-	
+datasource db {
+    provider = "mysql"
+    url      = "mysql://root:root1234@localhost:3306/compass"
+    schemas  = ["audit"]
+    // renameModelsFromSchemas audit auth
 }
 
+model users {
+    id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+    ulid             String?   @db.VarChar(255)
+    name             String    @db.VarChar(255)
+    role             Int?      @default(0)
+    email            String    @db.VarChar(255)
+    mobile           String?   @db.VarChar(255)
+    profile_pic_slug String?   @db.VarChar(255)
+    status           Int?      @default(1)
+    deleted_at       DateTime? @db.DateTime(0)
+    created_at       DateTime  @default(now()) @db.Timestamp(0)
+    updated_at       DateTime  @default(now()) @db.Timestamp(0)
 
-model Users { 
-	id BigInt @id() @default(autoincrement()) @db.UnsignedBigInt() @map("id")
-	ulid String? @db.VarChar(255) @map("ulid")
-	name String @db.VarChar(255) @map("name")
-	role Int? @default(0) @map("role")
-	email Json? @map("email")
-	mobile String? @db.VarChar(255) @map("mobile")
-	profilePicSlug String? @db.VarChar(255) @map("profile_pic_slug")
-	status Int? @default(1) @map("status")
-	deletedAt DateTime? @db.DateTime(0) @map("deleted_at")
-	createdAt DateTime @default(now()) @db.Timestamp(0) @map("created_at")
-	updatedAt DateTime @default(now()) @db.Timestamp(0) @map("updated_at")
-
-	@@index([deletedAt], map: "users_deletedat_index")
-	@@index([email], map: "users_email_index")
-	@@index([role], map: "users_role_index")
-	@@index([status], map: "users_status_index")
-	@@index([ulid], map: "users_ulid_index")
-	@@map("users")
+    @@index([deleted_at], map: "users_deletedat_index")
+    @@index([email], map: "users_email_index")
+    @@index([role], map: "users_role_index")
+    @@index([status], map: "users_status_index")
+    @@index([ulid], map: "users_ulid_index")
+	@@schema("auth")
 }
 
+model log {
+    id             Int      @id @default(autoincrement()) @db.UnsignedInt
+    auditable_type String   @db.VarChar(255)
+    auditable_id   Int
+    event_type     String   @db.VarChar(255)
+    event_values   Json
+    user_id        Int
+    created_at     DateTime @default(now()) @db.Timestamp(0)
+    updated_at     DateTime @default(now()) @db.Timestamp(0)
 
+    @@map("transactions")
+    @@schema("audit")
+}

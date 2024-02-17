@@ -10,6 +10,9 @@ export class StringUtil{
         return StringUtil.getTokens(string).filter(l=>l!=='')?.[i];
     }
     static getTokens(str: string): Array<string> {
+        if(!str){
+            return [];
+        }
         let tokenStart: number | undefined;
         let bracesCount: number = 0;
         const tokens: string[] = [];
@@ -79,5 +82,11 @@ export class StringUtil{
             };
         }
         return indices;
+    }
+    static isComment(line: string){
+        return line.trim().startsWith('//');
+    }
+    static getComments(lines: string[]): string[]{
+        return lines.filter(l=>l.trim().startsWith('//')).map(l=>l.trim().slice(2).trimStart());
     }
 }

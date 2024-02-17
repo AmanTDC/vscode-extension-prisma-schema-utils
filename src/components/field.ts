@@ -29,7 +29,6 @@ export class ModelField implements Field {
             this.name = tokens[0];
         }
         this.type = StringUtil.toPascalCase(tokens[1]);
-        console.log(tokens[1]);
     }
     toString(): String {
         return `${this.name} ${this.type} ${this.properties
@@ -50,6 +49,6 @@ export class ImmutableField implements Field {
         this.name = value.trim();
     }
     toString(): String {
-        return `${this.name}`;
+        return `${this.name.trim()}`;
     }
 }
