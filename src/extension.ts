@@ -1,26 +1,16 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { translate } from './features/translater';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "prisma-schema-mapper" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('prisma-schema-mapper.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from prisma-schema-mapper!');
-	});
-
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(vscode.commands.registerCommand('prisma-schema-mapper.snakeToCamel', async (e) => {
+		vscode.window.withProgress({
+			location: 15,
+			cancellable: true,
+			title: "Translating..."
+		}, async () => {
+			let input = await vscode.workspace.fs.readFile(e);
+			let output = await vscode.workspace.fs.writeFile(e, translate(input));
+		});
+	}));
 }
-
-// This method is called when your extension is deactivated
 export function deactivate() {}

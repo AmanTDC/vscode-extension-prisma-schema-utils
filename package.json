@@ -1,23 +1,46 @@
 {
   "name": "prisma-schema-mapper",
-  "displayName": "prisma-schema-mapper",
+  "displayName": "Prisma Schema Utils",
   "description": "A system to create mappings between snake case and camel case",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "author": "Aman Gupta",
+  "publisher": "Aman Gupta",
+  "repository": "https://github.com/AmanTDC/vscode-extension-prisma-schema-utils",
   "engines": {
     "vscode": "^1.86.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:prisma-schema-mapper.snakeToCamel"
+  ],
   "main": "./dist/extension.js",
+  "icon": "icon.png",
   "contributes": {
     "commands": [
       {
-        "command": "prisma-schema-mapper.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+				"command": "prisma-schema-mapper.snakeToCamel",
+				"title": "Prisma Schema Convert",
+				"when": "resourceLangId == prisma"
+			}
+    ],
+    "menus": {
+			"editor/context": [
+				{
+					"command": "prisma-schema-mapper.snakeToCamel",
+					"when": "resourceLangId == prisma",
+					"group": "1_modification"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "prisma-schema-mapper.snakeToCamel",
+					"when": "resourceLangId == prisma",
+					"group": "1_modification"
+				}
+			]
+		}
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
