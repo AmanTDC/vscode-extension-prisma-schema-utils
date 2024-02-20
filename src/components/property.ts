@@ -3,11 +3,13 @@ import { StringUtil } from "../utils/string";
 export interface Property {
     name: String;
     value: String;
+    token: string;
     toString() : String ;
 };
 export class BlockProperty implements Property {
     public name: string = '';
     public value: string = '';
+    public token: string = '';
     constructor(line: string){
         let i;
         const property = line.trim();
@@ -18,6 +20,7 @@ export class BlockProperty implements Property {
                 break;
             }
         }
+        this.token = property;
         let arrays = [];
         let arrayStarting = StringUtil.getAllIndices(this.value,'[');
         let arrayClosing = StringUtil.getAllIndices(this.value,']');
@@ -33,6 +36,7 @@ export class BlockProperty implements Property {
 export class FieldProperty implements Property {
     public name: string = '';
     public value: string = '';
+    token: string = '';
     constructor(token: string){
         let i: number;
         for(i=1;i<token.length;i++){
@@ -45,6 +49,7 @@ export class FieldProperty implements Property {
         if(i===token.length){
             this.name = token.slice(1,token.length);
         }
+        token = this.token;
         let arrays = [];
         let arrayStarting = StringUtil.getAllIndices(this.value,'[');
         let arrayClosing = StringUtil.getAllIndices(this.value,']');

@@ -2,7 +2,7 @@
   "name": "prisma-schema-mapper",
   "displayName": "Prisma Schema Utils",
   "description": "A system to create mappings between snake case and camel case",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "author": "Aman Gupta",
   "publisher": "Aman Gupta",
   "repository": "https://github.com/AmanTDC/vscode-extension-prisma-schema-utils",

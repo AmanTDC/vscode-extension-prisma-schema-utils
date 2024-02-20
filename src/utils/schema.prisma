@@ -1,46 +1,83 @@
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["multiSchema"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-    provider = "mysql"
-    url      = "mysql://root:root1234@localhost:3306/compass"
-    schemas  = ["audit"]
-    // renameModelsFromSchemas audit auth
+  provider = "postgres"
+  url      = "postgres://postgres:postgrespassword@localhost:5432/aeria"
+  schemas  = ["auth", "tenant"]
 }
 
-model users {
-    id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-    ulid             String?   @db.VarChar(255)
-    name             String    @db.VarChar(255)
-    role             Int?      @default(0)
-    email            String    @db.VarChar(255)
-    mobile           String?   @db.VarChar(255)
-    profile_pic_slug String?   @db.VarChar(255)
-    status           Int?      @default(1)
-    deleted_at       DateTime? @db.DateTime(0)
-    created_at       DateTime  @default(now()) @db.Timestamp(0)
-    updated_at       DateTime  @default(now()) @db.Timestamp(0)
+model user {
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime       @default(now()) @db.Timestamptz(6)
+  created_by    String?        @db.Uuid
+  updated_by    String?        @db.Uuid
+  metadata      Json           @default(dbgenerated("jsonb_build_object()"))
+  email         String?        @unique
+  phone         String?        @unique
+  blood_group   blood_group?
+  employee_info employee_info?
 
-    @@index([deleted_at], map: "users_deletedat_index")
-    @@index([email], map: "users_email_index")
-    @@index([role], map: "users_role_index")
-    @@index([status], map: "users_status_index")
-    @@index([ulid], map: "users_ulid_index")
-	@@schema("auth")
+  @@schema("auth")
 }
 
-model log {
-    id             Int      @id @default(autoincrement()) @db.UnsignedInt
-    auditable_type String   @db.VarChar(255)
-    auditable_id   Int
-    event_type     String   @db.VarChar(255)
-    event_values   Json
-    user_id        Int
-    created_at     DateTime @default(now()) @db.Timestamp(0)
-    updated_at     DateTime @default(now()) @db.Timestamp(0)
+model employee_info {
+  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at         DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime        @default(now()) @db.Timestamptz(6)
+  created_by         String?         @db.Uuid
+  updated_by         String?         @db.Uuid
+  metadata           Json            @default(dbgenerated("jsonb_build_object()"))
+  tenant_id          String          @db.Uuid
+  employee_id_number String?
+  user_id            String          @unique @db.Uuid
+  status             employee_status
+  upin_number        String?
+  temp_password      String?
+  upin               String?
+  tenant             tenant          @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tenant")
+  user               user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
 
-    @@map("transactions")
-    @@schema("audit")
+  @@schema("tenant")
+}
+
+model tenant {
+  id                      String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at              DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime        @default(now()) @db.Timestamptz(6)
+  created_by              String?         @db.Uuid
+  updated_by              String?         @db.Uuid
+  metadata                Json            @default(dbgenerated("jsonb_build_object()"))
+  name                    String
+  registered_company_name String
+  cin                     String
+  logo_key                String
+  upin_key                String
+  employee_info           employee_info[]
+
+  @@schema("tenant")
+}
+
+enum blood_group {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+
+  @@schema("auth")
+}
+
+enum employee_status {
+  ONBOARDED
+  ACTIVE
+  INACTIVE
+
+  @@schema("tenant")
 }
